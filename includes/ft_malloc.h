@@ -8,6 +8,7 @@
 void    *malloc(size_t sz);
 void    *realloc(void *ptr, size_t sz);
 void    free(void *ptr);
+void    afree(void);
 void    show_alloc_mem();
 
 #endif

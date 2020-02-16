@@ -2,8 +2,8 @@
 #include "private/malloc_private.h"
 #include <stdio.h>
 
-// TOTAL TODO: добавить чтобы размер зоны был кратен getpagesize() (проверить задание, может getpagesize() еще для чего то нужен) +
-// также потом добавить глобальный мьютекс для бонуса +
+// done TOTAL TODO: добавить чтобы размер зоны был кратен getpagesize() (проверить задание, может getpagesize() еще для чего то нужен) +
+// done также потом добавить глобальный мьютекс для бонуса +
 // добавить другие бонусы
 // всё это тестить, написать много других тестов(с невалидным инпутом в том числе)
 // норминетта
@@ -15,6 +15,9 @@
 int             ft_printf(const char *format, ...);
 
 t_zones malloc_zones = {NULL, NULL, NULL};
+/*
+ * Bonus 1
+ */
 pthread_mutex_t g_mtx_malloc = PTHREAD_MUTEX_INITIALIZER;
 
 size_t    show_blocks_info(t_malloc_block *block)
@@ -367,6 +370,9 @@ void    *malloc(size_t sz)
     return ptr;
 }
 
+/*
+ * Bonus 2
+ */
 void    *calloc(size_t cnt, size_t sz)
 {
     void    *ptr;
@@ -379,4 +385,47 @@ void    *calloc(size_t cnt, size_t sz)
     }
     pthread_mutex_unlock(&g_mtx_malloc);
     return ptr;
+}
+
+void    afree_large(t_malloc_block *large)
+{
+    void *to_free;
+
+    while (large)
+    {
+        to_free = (void*)large + sizeof(t_malloc_block);
+        large = large->next;
+        free_impl(to_free);
+    }
+}
+
+void    afree_zone(t_malloc_zone *zone)
+{
+    t_malloc_block *tmp_block;
+    void *to_free;
+
+    while (zone)
+    {
+        tmp_block = zone->allocated_blocks;
+        while (tmp_block)
+        {
+            to_free = (void*)tmp_block + sizeof(t_malloc_block);
+            tmp_block = tmp_block->next;
+            if (tmp_block == NULL)
+                zone = zone->next;
+            free_impl(to_free);
+        }
+    }
+}
+
+/*
+ * Bonus 3
+ */
+void    afree(void)
+{
+    pthread_mutex_lock(&g_mtx_malloc);
+    afree_zone(malloc_zones.tiny);
+    afree_zone(malloc_zones.small);
+    afree_large(malloc_zones.large);
+    pthread_mutex_unlock(&g_mtx_malloc);
 }

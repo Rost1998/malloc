@@ -1,6 +1,6 @@
 #!/bin/sh
 
-gcc main.c -L/home/rost/Education/malloc -lft_malloc -I ../includes/
+gcc main2.c -L../ -lft_malloc -I ../includes/
 
-LD_LIBRARY_PATH=/home/rost/Education/malloc ./a.out
+LD_LIBRARY_PATH=../:$LD_LIBRARY_PATH ./a.out
 

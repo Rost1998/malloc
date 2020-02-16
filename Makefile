@@ -37,10 +37,12 @@ $(NAME): $(OBJO)
 
 clean:
 	make clean -C $(LIBDIR)
+	make clean -C $(FT_PRINTF)
 	rm -f $(OBJO)
 
 fclean: clean
 	make fclean -C $(LIBDIR)
+	make fclean -C $(FT_PRINTF)
 	rm -f $(NAME) libft_malloc.so
 
 re: fclean all
