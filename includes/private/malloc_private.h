@@ -1,6 +1,8 @@
 #ifndef MALLOC_PRIVATE_H
 # define MALLOC_PRIVATE_H
 
+# define MALLOC_LOG_PREFIX "FT_MALLOC DEBUG: "
+
 # define ALLOCATIONS_NUM 100
 
 typedef enum {

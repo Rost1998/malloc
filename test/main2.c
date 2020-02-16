@@ -3,7 +3,7 @@
 #include "ft_malloc.h"
 #include <dlfcn.h>
 
-#define NUM 50
+#define NUM 5
 
 void    test(void *(*func)(size_t))
 {
@@ -57,7 +57,7 @@ int     main(void)
     show_alloc_mem();
     free(ptr_m);
     show_alloc_mem();
-    dprintf(2, "----------------------------------------\n");
+/*    dprintf(2, "----------------------------------------\n");
     dprintf(2, "----------------------------------------\n");
 
     size_t size = 10;
@@ -72,7 +72,7 @@ int     main(void)
     afree();
     dprintf(2, "free 2 done\n");
     show_alloc_mem();
-
+*/
     //write(1, (char*)&ptr, 8);
     //write(1, "\n", 1);
     //printf("%p\n", ptr);

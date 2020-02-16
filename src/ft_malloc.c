@@ -12,6 +12,11 @@
 // TODO: ALL TODO; why do we need aligning? (getpagesize); global mutex; norminette; 
 // TODO: The size of these zones must be a multiple of getpagesize(). - note
 
+
+
+
+// TODO: добавить попробовать поддержку валгринда https://stackoverflow.com/questions/30895018/custom-allocator-valgrind-shows-7-allocs-0-frees-no-leaks
+
 int             ft_printf(const char *format, ...);
 
 t_zones malloc_zones = {NULL, NULL, NULL};
@@ -20,7 +25,15 @@ t_zones malloc_zones = {NULL, NULL, NULL};
  */
 pthread_mutex_t g_mtx_malloc = PTHREAD_MUTEX_INITIALIZER;
 
-size_t    show_blocks_info(t_malloc_block *block)
+_Bool    malloc_debug_mode_my(void)
+{
+    char *env_var = getenv("FT_MALLOC_DEBUG");
+    if (env_var == NULL)
+        return 0;
+    return *env_var == '1' ? 1 : 0;
+}
+
+static size_t    show_blocks_info(t_malloc_block *block)
 {
     size_t size_sum;
 
@@ -35,7 +48,7 @@ size_t    show_blocks_info(t_malloc_block *block)
     return size_sum;
 }
 
-size_t    show_zones_info(t_malloc_zone *zone, t_zone zone_type)
+static size_t    show_zones_info(t_malloc_zone *zone, t_zone zone_type)
 {
     char *prefix;
     size_t size_sum;
@@ -71,7 +84,6 @@ void    show_alloc_mem(void)
 
 t_malloc_block *find_block(t_malloc_block *block, void *ptr)
 {
-//    while (block && (void*)block + sizeof(t_malloc_block) <= ptr)
     while (block)
     {
         if ((void*)block + sizeof(t_malloc_block) == ptr)
@@ -98,7 +110,7 @@ t_malloc_block *find_block_in_zones(t_malloc_zone *zone, void *ptr)
 }
 
 // test all free...
-void    free_zone(t_malloc_zone **zone_list, t_malloc_zone *zone)
+static void    free_zone(t_malloc_zone **zone_list, t_malloc_zone *zone)
 {
     size_t zone_size = 0;
 
@@ -114,10 +126,14 @@ void    free_zone(t_malloc_zone **zone_list, t_malloc_zone *zone)
         zone_size = sizeof(t_malloc_zone) + (TINY_BLOCK_SIZE + sizeof(t_malloc_block)) * ALLOCATIONS_NUM;
     else if (*zone_list == malloc_zones.small)
         zone_size = sizeof(t_malloc_zone) + (SMALL_BLOCK_SIZE + sizeof(t_malloc_block)) * ALLOCATIONS_NUM;
+    if (malloc_debug_mode_my())
+    {
+        write(1, MALLOC_LOG_PREFIX "freeing a memory zone...\n", ft_strlen(MALLOC_LOG_PREFIX) + 25);
+    }
     munmap(zone, zone_size);
 }
 
-void    free_block(t_malloc_zone **zone_main, void *ptr)
+static void    free_block(t_malloc_zone **zone_main, void *ptr)
 {
     t_malloc_zone *zone_tmp = *zone_main;
     t_malloc_block *block_tmp;
@@ -150,7 +166,7 @@ void    free_block(t_malloc_zone **zone_main, void *ptr)
     // nothing was found
 }
 
-void    free_large(void *ptr)
+static void    free_large(void *ptr)
 {
     t_malloc_block *block_tmp = find_block(malloc_zones.large, ptr);
 
@@ -162,6 +178,10 @@ void    free_large(void *ptr)
         block_tmp->prev->next = block_tmp->next;
     if (block_tmp->next)
         block_tmp->next->prev = block_tmp->prev;
+    if (malloc_debug_mode_my())
+    {
+        write(1, MALLOC_LOG_PREFIX "freeing a large memory block...\n", ft_strlen(MALLOC_LOG_PREFIX) + 32);
+    }
     munmap(block_tmp, block_tmp->size);
 }
 
@@ -323,10 +343,17 @@ static void     *get_block(t_malloc_zone **zone_main, size_t block_size, size_t 
 
 static void     *alloc_large(size_t size)
 {
-    void *mem_block = mmap(0, sizeof(t_malloc_block) + size, \
-                            PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
-    t_malloc_block *block_tmp = mem_block;
+    size_t zsize;
+    void *mem_block;
+    t_malloc_block *block_tmp;
 
+    zsize = malloc_align(sizeof(t_malloc_block) + size);
+    if (zsize == 0)
+        return NULL;
+    mem_block = mmap(0, zsize, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+    if (mem_block == MAP_FAILED)
+        return NULL;
+    block_tmp = mem_block;
     block_tmp->prev = NULL;
     block_tmp->next = malloc_zones.large;
     if (malloc_zones.large)
@@ -387,7 +414,7 @@ void    *calloc(size_t cnt, size_t sz)
     return ptr;
 }
 
-void    afree_large(t_malloc_block *large)
+static void    afree_large(t_malloc_block *large)
 {
     void *to_free;
 
@@ -399,7 +426,7 @@ void    afree_large(t_malloc_block *large)
     }
 }
 
-void    afree_zone(t_malloc_zone *zone)
+static void    afree_zone(t_malloc_zone *zone)
 {
     t_malloc_block *tmp_block;
     void *to_free;
@@ -429,3 +456,19 @@ void    afree(void)
     afree_large(malloc_zones.large);
     pthread_mutex_unlock(&g_mtx_malloc);
 }
+
+/*
+ * Bonus 4
+ */
+void    *reallocf(void *ptr, size_t sz)
+{
+    void    *new;
+
+    new = realloc_impl(ptr, sz);
+    if (new == NULL)
+    {
+        free_impl(ptr);
+    }
+    return (new);
+}
+
