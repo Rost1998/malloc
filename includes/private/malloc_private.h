@@ -2,6 +2,7 @@
 # define MALLOC_PRIVATE_H
 
 # define MALLOC_LOG_PREFIX "FT_MALLOC DEBUG: "
+# define MALLOC_LOG(str) write(1, MALLOC_LOG_PREFIX str "\n", 17 + ft_strlen(str) + 1)
 
 # define ALLOCATIONS_NUM 100
 

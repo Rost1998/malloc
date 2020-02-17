@@ -25,7 +25,7 @@ t_zones malloc_zones = {NULL, NULL, NULL};
  */
 pthread_mutex_t g_mtx_malloc = PTHREAD_MUTEX_INITIALIZER;
 
-_Bool    malloc_debug_mode_my(void)
+_Bool    malloc_debug_mode(void)
 {
     char *env_var = getenv("FT_MALLOC_DEBUG");
     if (env_var == NULL)
@@ -126,9 +126,9 @@ static void    free_zone(t_malloc_zone **zone_list, t_malloc_zone *zone)
         zone_size = sizeof(t_malloc_zone) + (TINY_BLOCK_SIZE + sizeof(t_malloc_block)) * ALLOCATIONS_NUM;
     else if (*zone_list == malloc_zones.small)
         zone_size = sizeof(t_malloc_zone) + (SMALL_BLOCK_SIZE + sizeof(t_malloc_block)) * ALLOCATIONS_NUM;
-    if (malloc_debug_mode_my())
+    if (malloc_debug_mode())
     {
-        write(1, MALLOC_LOG_PREFIX "freeing a memory zone...\n", ft_strlen(MALLOC_LOG_PREFIX) + 25);
+        MALLOC_LOG("freeing a memory zone");
     }
     munmap(zone, zone_size);
 }
@@ -157,6 +157,10 @@ static void    free_block(t_malloc_zone **zone_main, void *ptr)
             if (zone_tmp->free_blocks)
                 zone_tmp->free_blocks->prev = block_tmp;
             zone_tmp->free_blocks = block_tmp;
+            if (malloc_debug_mode())
+            {
+                MALLOC_LOG("freeing a memory block");
+            }
             if (zone_tmp->allocated_blocks == NULL)
                 free_zone(zone_main, zone_tmp);
             return;
@@ -178,9 +182,9 @@ static void    free_large(void *ptr)
         block_tmp->prev->next = block_tmp->next;
     if (block_tmp->next)
         block_tmp->next->prev = block_tmp->prev;
-    if (malloc_debug_mode_my())
+    if (malloc_debug_mode())
     {
-        write(1, MALLOC_LOG_PREFIX "freeing a large memory block...\n", ft_strlen(MALLOC_LOG_PREFIX) + 32);
+        MALLOC_LOG("freeing a large memory block");
     }
     munmap(block_tmp, block_tmp->size);
 }
@@ -287,6 +291,10 @@ static t_malloc_zone *add_zone(t_malloc_zone **zone_main, size_t block_size)
     zone_mem = mmap(0, zsize, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
     if (zone_mem == MAP_FAILED)
         return NULL;
+    if (malloc_debug_mode())
+    {
+        MALLOC_LOG("allocated a memory zone");
+    }
     free_blocks = zone_mem + sizeof(t_malloc_zone);
 
     t_malloc_zone *zone_tmp = zone_mem;
@@ -323,6 +331,10 @@ static void     *block_alloc(t_malloc_zone *zone, size_t size)
         zone->allocated_blocks->prev = tmp;
     zone->allocated_blocks = tmp;
     tmp->size = size;
+    if (malloc_debug_mode())
+    {
+        MALLOC_LOG("allocated a memory block");
+    }
     return ((void*)tmp + sizeof(t_malloc_block));
 }
 
