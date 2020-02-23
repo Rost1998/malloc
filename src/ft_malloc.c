@@ -1,6 +1,9 @@
 #include "ft_malloc.h"
 #include "private/malloc_private.h"
 
+// 1. проверить на мак ОС по первым пунктам (page reclaims)
+// 2. нормы
+
 t_zones malloc_zones = {NULL, NULL, NULL};
 /*
  * Bonus 1
