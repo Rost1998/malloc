@@ -12,10 +12,11 @@ typedef enum {
     LARGE_ZONE
 } t_zone;
 
-# define TINY_BLOCK_SIZE (1 << 6)
-# define SMALL_BLOCK_SIZE (1 << 10)
+# define FT_KB (1024)
+# define FT_MB (1024 * 1024)
 
-# define MALLOC_ZONE_DATA (1 << 7)
+# define TINY_BLOCK_SIZE (FT_KB)
+# define SMALL_BLOCK_SIZE (FT_MB)
 
 typedef struct s_malloc_block {
     struct s_malloc_block   *next;

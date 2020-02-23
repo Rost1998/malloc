@@ -32,17 +32,17 @@ all: $(NAME)
 
 $(NAME): $(OBJO)
 	make -C $(LIBDIR)
-	make -C $(FT_PRINTF)
-	gcc $(CFLAGS) -shared -o $(NAME) $(OBJO) -L./$(LIBDIR) -L./ft_printf -lftprintf -lft -pthread -I ../includes
+	#make -C $(FT_PRINTF)
+	gcc $(CFLAGS) -shared -o $(NAME) $(OBJO) -L./$(LIBDIR) -lft -pthread -I ../includes
 
 clean:
 	make clean -C $(LIBDIR)
-	make clean -C $(FT_PRINTF)
+	#make clean -C $(FT_PRINTF)
 	rm -f $(OBJO)
 
 fclean: clean
 	make fclean -C $(LIBDIR)
-	make fclean -C $(FT_PRINTF)
+	#make fclean -C $(FT_PRINTF)
 	rm -f $(NAME) libft_malloc.so
 
 re: fclean all

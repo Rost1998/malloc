@@ -1,6 +1,6 @@
 #include "ft_malloc.h"
 #include "private/malloc_private.h"
-#include <stdio.h>
+//#include <stdio.h>
 
 // done TOTAL TODO: добавить чтобы размер зоны был кратен getpagesize() (проверить задание, может getpagesize() еще для чего то нужен) +
 // done также потом добавить глобальный мьютекс для бонуса +
@@ -17,8 +17,6 @@
 
 // TODO: добавить попробовать поддержку валгринда https://stackoverflow.com/questions/30895018/custom-allocator-valgrind-shows-7-allocs-0-frees-no-leaks
 
-int             ft_printf(const char *format, ...);
-
 t_zones malloc_zones = {NULL, NULL, NULL};
 /*
  * Bonus 1
@@ -33,6 +31,69 @@ _Bool    malloc_debug_mode(void)
     return *env_var == '1' ? 1 : 0;
 }
 
+void    ft_revarr_malloc(char *str)
+{
+    int     i;
+    int     len;
+    char    tmp;
+
+    i = 0;
+    len = ft_strlen(str) - 1;
+    while (i < len)
+    {
+        tmp = str[i];
+        str[i++] = str[len];
+        str[len--] = tmp;
+    }
+}
+
+char        *ft_itoa_base_malloc(char *res, uintmax_t a, unsigned base)
+{
+    const char    *symbols;
+    int     i;  
+
+    symbols = "0123456789abcdef";
+    if (!a)
+        *res = '0';
+    i = 0;
+    while (a) 
+    {
+        res[i++] = symbols[a % base];
+        a /= base;
+    }
+    ft_revarr_malloc(res);
+    return (res);
+}
+
+void    print_addr_malloc(void *ptr)
+{
+    char addr[1024];
+
+    ft_memset(addr, 0, 1024);
+    write(1, "0x", 2);
+    ft_itoa_base_malloc(addr, (uintmax_t)ptr, 16);
+    write(1, addr, ft_strlen(addr));
+}
+
+void    print_int_malloc(uintmax_t val)
+{
+    char num[1024];
+
+    ft_memset(num, 0, 1024);
+    ft_itoa_base_malloc(num, val, 10);
+    write(1, num, ft_strlen(num));
+}
+
+void    print_block_info(void *ptr_start, void *ptr_end, size_t size)
+{
+    print_addr_malloc(ptr_start);
+    write(1, " - ", 3);
+    print_addr_malloc(ptr_end);
+    write(1, " : ", 3);
+    print_int_malloc(size);
+    write(1, "\n", 1);
+}
+
 static size_t    show_blocks_info(t_malloc_block *block)
 {
     size_t size_sum;
@@ -41,11 +102,26 @@ static size_t    show_blocks_info(t_malloc_block *block)
     while (block)
     {
         void *mem = (void*)block + sizeof(t_malloc_block);
-        ft_printf("%p - %p : %ld\n", mem, mem + block->size, block->size);
+        print_block_info(mem, mem + block->size, block->size);
         size_sum += block->size;
         block = block->next;
     }
     return size_sum;
+}
+
+void    print_zone_info(const char *prefix, void *ptr)
+{
+    write(1, prefix, ft_strlen(prefix));
+    write(1, " : ", 3);
+    print_addr_malloc(ptr);
+    write(1, "\n", 1);
+}
+
+void    print_total_mem(size_t mem_sz)
+{
+    write(1, "Total : ", 8);
+    print_int_malloc(mem_sz);
+    write(1, " bytes\n", 7);
 }
 
 static size_t    show_zones_info(t_malloc_zone *zone, t_zone zone_type)
@@ -60,7 +136,7 @@ static size_t    show_zones_info(t_malloc_zone *zone, t_zone zone_type)
         prefix = "SMALL";
     while (zone)
     {
-        ft_printf("%s : %p\n", prefix, zone);
+        print_zone_info(prefix, zone);
         size_sum += show_blocks_info(zone->allocated_blocks);
         zone = zone->next;
     }
@@ -71,15 +147,17 @@ void    show_alloc_mem(void)
 {
     size_t allocated_mem_size;
 
+    pthread_mutex_lock(&g_mtx_malloc);
     allocated_mem_size = 0;
     allocated_mem_size += show_zones_info(malloc_zones.tiny, TINY_ZONE);
     allocated_mem_size += show_zones_info(malloc_zones.small, SMALL_ZONE);
     if (malloc_zones.large)
     {
-        ft_printf("LARGE : %p\n", malloc_zones.large);
+        print_zone_info("LARGE", malloc_zones.large);
         allocated_mem_size += show_blocks_info(malloc_zones.large);
     }
-    ft_printf("Total : %ld bytes\n", allocated_mem_size);
+    print_total_mem(allocated_mem_size);
+    pthread_mutex_unlock(&g_mtx_malloc);
 }
 
 t_malloc_block *find_block(t_malloc_block *block, void *ptr)
@@ -219,12 +297,24 @@ void    free(void *ptr)
     pthread_mutex_unlock(&g_mtx_malloc);
 }
 
+// TODO: !!!!!!!!!!! исправить реаллок чтобы работал как по ману
+// If ptr is NULL, then the call is equivalent to malloc(size), for all values of size; if size is equal to zero,
+// and ptr is not NULL, then the call is equivalent to free(ptr).
 void    *realloc_impl(void *ptr, size_t sz)
 {
     t_malloc_block *block;
     size_t block_min_size;
     void *new;
 
+    if (ptr == NULL)
+    {
+        return malloc_impl(sz);
+    }
+    if (sz == 0)
+    {
+        free_impl(ptr);
+        return NULL;
+    }
     block = find_block_in_zones(malloc_zones.tiny, ptr);
     block_min_size = 0;
     if (block == NULL)
@@ -290,7 +380,13 @@ static t_malloc_zone *add_zone(t_malloc_zone **zone_main, size_t block_size)
         return NULL;
     zone_mem = mmap(0, zsize, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
     if (zone_mem == MAP_FAILED)
+    {
+        if (malloc_debug_mode())
+        {
+            MALLOC_LOG("Couldn't allocate a memory zone");
+        }
         return NULL;
+    }
     if (malloc_debug_mode())
     {
         MALLOC_LOG("allocated a memory zone");
@@ -359,12 +455,20 @@ static void     *alloc_large(size_t size)
     void *mem_block;
     t_malloc_block *block_tmp;
 
+    if (sizeof(t_malloc_block) + size < size)
+        return NULL;
     zsize = malloc_align(sizeof(t_malloc_block) + size);
     if (zsize == 0)
         return NULL;
     mem_block = mmap(0, zsize, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
     if (mem_block == MAP_FAILED)
+    {
+        if (malloc_debug_mode())
+        {
+            MALLOC_LOG("Couldn't allocate a large memory zone");
+        }
         return NULL;
+    }
     block_tmp = mem_block;
     block_tmp->prev = NULL;
     block_tmp->next = malloc_zones.large;
@@ -372,6 +476,10 @@ static void     *alloc_large(size_t size)
         block_tmp->next->prev = block_tmp;
     block_tmp->size = size;
     malloc_zones.large = block_tmp;
+    if (malloc_debug_mode())
+    {
+        MALLOC_LOG("allocated a large memory zone");
+    }
     return mem_block + sizeof(t_malloc_block);
 }
 

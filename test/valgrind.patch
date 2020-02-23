@@ -1,0 +1,34 @@
+--- mc_malloc_wrappers.c.old	2020-02-16 20:08:05.753216363 +0200
++++ valgrind/memcheck/mc_malloc_wrappers.c	2020-02-16 20:09:59.009111949 +0200
+@@ -956,6 +956,7 @@ void MC_(mempool_free)(Addr pool, Addr a
+ 
+    die_and_free_mem ( tid, mc, mp->rzB );
+    if (MP_DETAILED_SANITY_CHECKS) check_mempool_sane(mp);
++   cmalloc_n_frees++;
+ }
+ 
+ 
+@@ -1018,6 +1019,7 @@ void MC_(mempool_trim)(Addr pool, Addr a
+             return;
+          }
+          die_and_free_mem ( tid, mc, mp->rzB );  
++         cmalloc_n_frees++;
+ 
+       } else {
+ 
+@@ -1030,6 +1032,7 @@ void MC_(mempool_trim)(Addr pool, Addr a
+             MC_(record_free_error)(tid, (Addr)mc->data);
+             VG_(free)(chunks);
+             if (MP_DETAILED_SANITY_CHECKS) check_mempool_sane(mp);
++            cmalloc_n_frees++;
+             return;
+          }
+ 
+@@ -1064,6 +1067,7 @@ void MC_(mempool_trim)(Addr pool, Addr a
+          mc->data = lo;
+          mc->szB = (UInt) (hi - lo);
+          VG_(HT_add_node)( mp->chunks, mc );        
++         cmalloc_n_frees++;
+       }
+ 
+ #undef EXTENT_CONTAINS

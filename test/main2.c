@@ -29,19 +29,19 @@ int     main(void)
 
     for (i = 0; i < NUM; ++i)
     {
-        array[i] = malloc(120);
+        array[i] = malloc(2048);
     }
     dprintf(2, "malloc done\n");
     show_alloc_mem();
     for (i = 0; i < NUM; ++i)
     {
-        array[i] = realloc(array[i], 5);
+        array[i] = realloc(array[i], 512);
     }
     dprintf(2, "realloc 1 done\n");
     show_alloc_mem();
     for (i = 0; i < NUM; ++i)
     {
-        array[i] = realloc(array[i], 2048);
+        array[i] = realloc(array[i], 1024 * 1024 * 5);
     }
     dprintf(2, "realloc 2 done\n");
     show_alloc_mem();
@@ -57,7 +57,7 @@ int     main(void)
     show_alloc_mem();
     free(ptr_m);
     show_alloc_mem();
-/*    dprintf(2, "----------------------------------------\n");
+    dprintf(2, "----------------------------------------\n");
     dprintf(2, "----------------------------------------\n");
 
     size_t size = 10;
@@ -72,11 +72,76 @@ int     main(void)
     afree();
     dprintf(2, "free 2 done\n");
     show_alloc_mem();
-*/
+
+    dprintf(2, "----------------------------------------\n");
+    dprintf(2, "----------------------------------------\n");
+//#if 0
+    char *valid_addr = malloc(15);
+    
+    for (int i = 0; i < 15; ++i)
+    {
+        valid_addr[i] = 42;
+    }
+    
+    void *ret;
+
+    show_alloc_mem();
+    ret = malloc(0);
+    dprintf(2, "malloc(0) == %p\n", ret);
+    show_alloc_mem();
+
+    ret = malloc((size_t)-1);
+    dprintf(2, "malloc(%lu) == %p\n", (size_t)-1, ret);
+    show_alloc_mem();
+
+    ret = malloc(9223372036854775807);
+    dprintf(2, "malloc(9223372036854775807) == %p\n", ret);
+    show_alloc_mem();
+
+    ret = realloc(valid_addr, 0);
+    dprintf(2, "realloc(valid_addr, 0) == %p\n", ret);
+    show_alloc_mem();
+
+    ret = realloc(valid_addr, 9223372036854775807);
+    dprintf(2, "realloc(valid_addr, 9223372036854775807) == %p\n", ret);
+    show_alloc_mem();
+    dprintf(2, "----------------------------------------\n");
+
+    valid_addr = realloc(NULL, 15);
+    for (int i = 0; i < 15; ++i)
+    {
+        valid_addr[i] = 42;
+    }
+
+    for (int i = 0; i < 15; ++i)
+    {
+        dprintf(2, "%d ", valid_addr[i]);
+    }
+    dprintf(2, "\n");
+    valid_addr = realloc(valid_addr, 8);
+    for (int i = 0; i < 8; ++i)
+    {
+        dprintf(2, "%d ", valid_addr[i]);
+    }
+    dprintf(2, "\n");
+    valid_addr = realloc(valid_addr, 25);
+    for (int i = 0; i < 25; ++i)
+    {
+        dprintf(2, "%d ", valid_addr[i]);
+    }
+    dprintf(2, "\n");
+    valid_addr = realloc(valid_addr, 250);
+    for (int i = 0; i < 250; ++i)
+    {
+        dprintf(2, "%d ", valid_addr[i]);
+    }
+    dprintf(2, "\n");
+
     //write(1, (char*)&ptr, 8);
     //write(1, "\n", 1);
     //printf("%p\n", ptr);
     //dlclose(handle);
+//#endif
     return 0;
 }
 
