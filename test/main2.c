@@ -30,6 +30,7 @@ int     main(void)
     for (i = 0; i < NUM; ++i)
     {
         array[i] = malloc(2048);
+        array[i][0] = '0';
     }
     dprintf(2, "malloc done\n");
     show_alloc_mem();

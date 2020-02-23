@@ -22,27 +22,23 @@ OBJC = $(OBJSRC:%.c=src/%.c)
 OBJO = $(OBJSRC:.c=.o)
 CFLAGS = -Wall -Werror -Wextra
 LIBDIR = libft
-FT_PRINTF = ft_printf
 
 %.o: src/%.c
 	gcc $(CFLAGS) -fPIC -c $< -pthread -I includes
 
 all: $(NAME)
-	ln -s $(NAME) libft_malloc.so
 
 $(NAME): $(OBJO)
 	make -C $(LIBDIR)
-	#make -C $(FT_PRINTF)
 	gcc $(CFLAGS) -shared -o $(NAME) $(OBJO) -L./$(LIBDIR) -lft -pthread -I ../includes
+	ln -s $(NAME) libft_malloc.so
 
 clean:
 	make clean -C $(LIBDIR)
-	#make clean -C $(FT_PRINTF)
 	rm -f $(OBJO)
 
 fclean: clean
 	make fclean -C $(LIBDIR)
-	#make fclean -C $(FT_PRINTF)
 	rm -f $(NAME) libft_malloc.so
 
 re: fclean all

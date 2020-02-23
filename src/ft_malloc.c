@@ -1,21 +1,5 @@
 #include "ft_malloc.h"
 #include "private/malloc_private.h"
-//#include <stdio.h>
-
-// done TOTAL TODO: добавить чтобы размер зоны был кратен getpagesize() (проверить задание, может getpagesize() еще для чего то нужен) +
-// done также потом добавить глобальный мьютекс для бонуса +
-// добавить другие бонусы
-// всё это тестить, написать много других тестов(с невалидным инпутом в том числе)
-// норминетта
-// сдавать это говно
-
-// TODO: ALL TODO; why do we need aligning? (getpagesize); global mutex; norminette; 
-// TODO: The size of these zones must be a multiple of getpagesize(). - note
-
-
-
-
-// TODO: добавить попробовать поддержку валгринда https://stackoverflow.com/questions/30895018/custom-allocator-valgrind-shows-7-allocs-0-frees-no-leaks
 
 t_zones malloc_zones = {NULL, NULL, NULL};
 /*
@@ -23,6 +7,9 @@ t_zones malloc_zones = {NULL, NULL, NULL};
  */
 pthread_mutex_t g_mtx_malloc = PTHREAD_MUTEX_INITIALIZER;
 
+/*
+ * Bonus 5
+ */
 _Bool    malloc_debug_mode(void)
 {
     char *env_var = getenv("FT_MALLOC_DEBUG");
@@ -297,9 +284,6 @@ void    free(void *ptr)
     pthread_mutex_unlock(&g_mtx_malloc);
 }
 
-// TODO: !!!!!!!!!!! исправить реаллок чтобы работал как по ману
-// If ptr is NULL, then the call is equivalent to malloc(size), for all values of size; if size is equal to zero,
-// and ptr is not NULL, then the call is equivalent to free(ptr).
 void    *realloc_impl(void *ptr, size_t sz)
 {
     t_malloc_block *block;
@@ -517,12 +501,28 @@ void    *malloc(size_t sz)
     return ptr;
 }
 
+_Bool   is_mul_overflow(uintmax_t a, uintmax_t b)
+{
+    uintmax_t res;
+
+    if (a == 0 || b == 0)
+        return 0;
+    res = a * b;
+    if (a == res / b)
+        return 0;
+    else
+        return 1;
+}
+
 /*
  * Bonus 2
  */
 void    *calloc(size_t cnt, size_t sz)
 {
     void    *ptr;
+
+    if (is_mul_overflow(cnt, sz))
+        return NULL;
 
     pthread_mutex_lock(&g_mtx_malloc);
     ptr = malloc_impl(cnt * sz);
@@ -584,11 +584,30 @@ void    *reallocf(void *ptr, size_t sz)
 {
     void    *new;
 
+    pthread_mutex_lock(&g_mtx_malloc);
     new = realloc_impl(ptr, sz);
     if (new == NULL)
     {
         free_impl(ptr);
     }
+    pthread_mutex_unlock(&g_mtx_malloc);
+    return (new);
+}
+
+/*
+ * Bonus 6
+ */
+void    *reallocarray(void *ptr, size_t nmemb, size_t size)
+{
+    void *new;
+
+    if (is_mul_overflow(nmemb, size))
+        return NULL;
+
+    pthread_mutex_lock(&g_mtx_malloc);
+    new = realloc_impl(ptr, nmemb * size);
+    pthread_mutex_unlock(&g_mtx_malloc);
+
     return (new);
 }
 
