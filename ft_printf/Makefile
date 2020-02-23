@@ -42,18 +42,21 @@ OBJ2 = ft_printf.o a_adjustment.o a_width.o\
 	  ft_memmove.o ft_putstr.o ft_revbits.o ft_isdigit.o ft_itoafloat.o\
 	  ft_memset.o ft_putwchar.o ft_strlen.o ft_iswhitespaces.o ft_memalloc.o\
 	  ft_pow.o ft_realloc.o ft_uitoa.o ft_itoa.o ft_memcpy.o\
-	  ft_putnbr.o ft_revarr.o
+	  ft_putnbr.o ft_revarr.o \
+	  ft_atoi.o           ft_itoa_base.o  ft_memalloc.o  ft_memset.o  ft_putstr.o    ft_revarr.o   ft_uitoa.o \
+	  ft_isdigit.o        ft_itoa.o       ft_memcpy.o    ft_pow.o     ft_putwchar.o  ft_revbits.o \
+	  ft_iswhitespaces.o  ft_itoafloat.o  ft_memmove.o   ft_putnbr.o  ft_realloc.o   ft_strlen.o 
 
 NAME = libftprintf.a
 INCLUDES = includes/libftprintf.h
 CFLAGS = -Wall -Werror -Wextra
 
-%.o: %.c $(INCLUDES)
+%.o: srcs/%.c $(INCLUDES)
 	gcc $(CFLAGS) -fPIC -c $< -I includes
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
+$(NAME): $(OBJ2)
 	ar rc $(NAME) $(OBJ2)
 	ranlib $(NAME)
 clean:
