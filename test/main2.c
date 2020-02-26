@@ -91,9 +91,9 @@ int     main(void)
     dprintf(2, "malloc(0) == %p\n", ret);
     show_alloc_mem();
 
-    ret = malloc((size_t)-1);
-    dprintf(2, "malloc(%lu) == %p\n", (size_t)-1, ret);
-    show_alloc_mem();
+    //ret = malloc((size_t)-1);
+    //dprintf(2, "malloc(%lu) == %p\n", (size_t)-1, ret);
+    //show_alloc_mem();
 
     ret = malloc(9223372036854775807);
     dprintf(2, "malloc(9223372036854775807) == %p\n", ret);

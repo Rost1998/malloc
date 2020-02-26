@@ -16,7 +16,7 @@ endif
 
 NAME = libft_malloc_$(HOSTTYPE).so
 
-OBJSRC = ft_malloc.c
+OBJSRC = ft_malloc.c ft_realloc.c ft_free.c ft_free_sup.c support_func.c show.c alloc.c print.c print_sup.c
 
 OBJC = $(OBJSRC:%.c=src/%.c)
 OBJO = $(OBJSRC:.c=.o)
