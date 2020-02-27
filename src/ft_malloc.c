@@ -29,20 +29,12 @@ void    *malloc_impl(size_t sz)
 
     if (sz == 0)
         return NULL;
-    switch (zone_type)
-    {
-        case TINY_ZONE:
-            ptr = get_block(&g_malloc_zones.tiny, TINY_BLOCK_SIZE, sz);
-            break;
-        case SMALL_ZONE:
-            ptr = get_block(&g_malloc_zones.small, SMALL_BLOCK_SIZE, sz);
-            break;
-        case LARGE_ZONE:
-            ptr = alloc_large(sz);
-            break;
-        default:
-            break;
-    }
+    if (zone_type == TINY_ZONE)
+        ptr = get_block(&g_malloc_zones.tiny, TINY_BLOCK_SIZE, sz);
+    if (zone_type == SMALL_ZONE)
+        ptr = get_block(&g_malloc_zones.small, SMALL_BLOCK_SIZE, sz);
+    if (zone_type == LARGE_ZONE)
+        ptr = alloc_large(sz);
     return ptr;
 }
 
