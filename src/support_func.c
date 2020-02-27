@@ -42,9 +42,6 @@ size_t  malloc_align(size_t size)
 
     ret_size = 0;
     pagesize = getpagesize();
-    /*
-     * Check for overflow
-     */
     if (size + (pagesize - (size % pagesize)) > size)
         ret_size = size + (pagesize - (size % pagesize));
     return ret_size;

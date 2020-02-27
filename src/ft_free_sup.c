@@ -17,10 +17,29 @@ void    free_zone(t_malloc_zone **zone_list, t_malloc_zone *zone)
     else if (*zone_list == g_malloc_zones.small)
         zone_size = sizeof(t_malloc_zone) + (SMALL_BLOCK_SIZE + sizeof(t_malloc_block)) * ALLOCATIONS_NUM;
     if (malloc_debug_mode())
-    {
         MALLOC_LOG("freeing a memory zone");
-    }
     munmap(zone, zone_size);
+}
+
+static void free_block_in(t_malloc_zone *zone_tmp, t_malloc_block *block_tmp)
+{
+    if (block_tmp == zone_tmp->allocated_blocks)
+    {
+        zone_tmp->allocated_blocks = zone_tmp->allocated_blocks->next;
+        if (zone_tmp->allocated_blocks)
+            zone_tmp->allocated_blocks->prev = NULL;
+    }
+    if (block_tmp->prev)
+        block_tmp->prev->next = block_tmp->next;
+    if (block_tmp->next)
+        block_tmp->next->prev = block_tmp->prev;
+    block_tmp->prev = NULL;
+    block_tmp->next = zone_tmp->free_blocks;
+    if (zone_tmp->free_blocks)
+        zone_tmp->free_blocks->prev = block_tmp;
+    zone_tmp->free_blocks = block_tmp;
+    if (malloc_debug_mode())
+        MALLOC_LOG("freeing a memory block");
 }
 
 void    free_block(t_malloc_zone **zone_main, void *ptr)
@@ -32,28 +51,10 @@ void    free_block(t_malloc_zone **zone_main, void *ptr)
     {   
         if ((block_tmp = find_block(zone_tmp->allocated_blocks, ptr)) != NULL)
         {
-            if (block_tmp == zone_tmp->allocated_blocks)
-            {
-                zone_tmp->allocated_blocks = zone_tmp->allocated_blocks->next;
-                if (zone_tmp->allocated_blocks)
-                    zone_tmp->allocated_blocks->prev = NULL;
-            }
-            if (block_tmp->prev)
-                block_tmp->prev->next = block_tmp->next;
-            if (block_tmp->next)
-                block_tmp->next->prev = block_tmp->prev;
-            block_tmp->prev = NULL;
-            block_tmp->next = zone_tmp->free_blocks;
-            if (zone_tmp->free_blocks)
-                zone_tmp->free_blocks->prev = block_tmp;
-            zone_tmp->free_blocks = block_tmp;
-            if (malloc_debug_mode())
-            {
-                MALLOC_LOG("freeing a memory block");
-            }
+            free_block_in(zone_tmp, block_tmp);
             if (zone_tmp->allocated_blocks == NULL)
                 free_zone(zone_main, zone_tmp);
-            return;
+            break;
         }
         zone_tmp = zone_tmp->next;
     }

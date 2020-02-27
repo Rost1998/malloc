@@ -9,18 +9,12 @@ void    free_impl(void *ptr)
         return;
     block_tmp = ptr - sizeof(t_malloc_block);
     zone_type = (block_tmp->size > TINY_BLOCK_SIZE) + (block_tmp->size > SMALL_BLOCK_SIZE);
-    switch (zone_type)
-    {
-        case TINY_ZONE:
-            free_block(&g_malloc_zones.tiny, ptr);
-            break;
-        case SMALL_ZONE:
-            free_block(&g_malloc_zones.small, ptr);
-            break;
-        case LARGE_ZONE:
-            free_large(ptr);
-            break;
-    }   
+    if (zone_type == TINY_ZONE)
+        free_block(&g_malloc_zones.tiny, ptr);
+    else if (zone_type == SMALL_ZONE)
+        free_block(&g_malloc_zones.small, ptr);
+    else if (zone_type == LARGE_ZONE)
+        free_large(ptr);
 }
 
 void    free(void *ptr)

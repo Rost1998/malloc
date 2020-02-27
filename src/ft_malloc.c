@@ -72,4 +72,3 @@ void    *calloc(size_t cnt, size_t sz)
     pthread_mutex_unlock(&g_mtx_malloc);
     return ptr;
 }
-
