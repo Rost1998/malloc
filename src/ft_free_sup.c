@@ -17,7 +17,7 @@ void		free_zone(t_malloc_zone **zone_list, t_malloc_zone *zone)
 	else if (*zone_list == g_malloc_zones.small)
 		zone_size = sizeof(t_malloc_zone) + (SMALL_BLOCK_SIZE + sizeof(t_malloc_block)) * ALLOCATIONS_NUM;
 	if (malloc_debug_mode())
-		MALLOC_LOG("freeing a memory zone");
+		MALLOC_LOG("freeing a memory zone", zone, zone_size);
 	munmap(zone, zone_size);
 }
 
@@ -39,7 +39,7 @@ static void	free_block_in(t_malloc_zone *zone_tmp, t_malloc_block *block_tmp)
 		zone_tmp->free_blocks->prev = block_tmp;
 	zone_tmp->free_blocks = block_tmp;
 	if (malloc_debug_mode())
-		MALLOC_LOG("freeing a memory block");
+		MALLOC_LOG("freeing a memory block", block_tmp, block_tmp->size);
 }
 
 _Bool		free_block(t_malloc_zone **zone_main, void *ptr)
@@ -76,7 +76,7 @@ _Bool		free_large(void *ptr)
 	if (block_tmp->next)
 		block_tmp->next->prev = block_tmp->prev;
 	if (malloc_debug_mode())
-		MALLOC_LOG("freeing a large memory block");
+		MALLOC_LOG("freeing a large memory block", block_tmp, block_tmp->size);
 	munmap(block_tmp, block_tmp->size);
 	return 1;
 }

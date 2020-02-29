@@ -16,7 +16,7 @@ void			*block_alloc(t_malloc_zone *zone, size_t size)
 	zone->allocated_blocks = tmp;
 	tmp->size = size;
 	if (malloc_debug_mode())
-		MALLOC_LOG("allocated a memory block");
+		MALLOC_LOG("allocated a memory block", tmp, size);
 	return ((void*)tmp + sizeof(t_malloc_block));
 }
 
@@ -31,11 +31,11 @@ static t_malloc_zone	*alloc_zone(size_t block_size, size_t *zsize)
 	if (zone_mem == MAP_FAILED)
 	{
 		if (malloc_debug_mode())
-			MALLOC_LOG("Couldn't allocate a memory zone");
+			MALLOC_LOG("Couldn't allocate a memory zone", NULL, *zsize);
 		return (NULL);
 	}
 	if (malloc_debug_mode())
-		MALLOC_LOG("allocated a memory zone");
+		MALLOC_LOG("allocated a memory zone", zone_mem, *zsize);
 	return (zone_mem);
 }
 
@@ -82,7 +82,7 @@ void			*alloc_large(size_t size)
 	if (mem_block == MAP_FAILED)
 	{
 		if (malloc_debug_mode())
-			MALLOC_LOG("Couldn't allocate a large memory zone");
+			MALLOC_LOG("Couldn't allocate a large memory zone", NULL, zsize);
 		return (NULL);
 	}
 	block_tmp = mem_block;
@@ -93,6 +93,6 @@ void			*alloc_large(size_t size)
 	block_tmp->size = size;
 	g_malloc_zones.large = block_tmp;
 	if (malloc_debug_mode())
-		MALLOC_LOG("allocated a large memory zone");
+		MALLOC_LOG("allocated a large memory zone", mem_block, zsize);
 	return (mem_block + sizeof(t_malloc_block));
 }

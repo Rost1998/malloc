@@ -9,7 +9,7 @@
 # include "libft.h"
 
 # define MALLOC_LOG_PREFIX "FT_MALLOC DEBUG: "
-# define MALLOC_LOG(str) malloc_log(MALLOC_LOG_PREFIX str, 17 + ft_strlen(str))
+# define MALLOC_LOG(str, addr, sz) malloc_log(MALLOC_LOG_PREFIX str, 17 + ft_strlen(str), addr, sz)
 
 # define ALLOCATIONS_NUM 100
 
@@ -59,13 +59,15 @@ _Bool		is_mul_overflow(unsigned long long a, unsigned long long b);
 t_malloc_zone *add_zone(t_malloc_zone **zone_main, size_t block_size);
 void		*alloc_large(size_t size);
 void		*block_alloc(t_malloc_zone *zone, size_t size);
-void		print_block_info(void *ptr_start, void *ptr_end, size_t size);
-void		print_zone_info(const char *prefix, void *ptr);
-void		print_total_mem(size_t mem_sz);
+void		print_block_info(void *ptr_start, void *ptr_end, size_t size, int fd);
+void        print_addr_malloc(void *ptr, int fd);
+void        print_int_malloc(unsigned long long val, int fd);
+void		print_zone_info(const char *prefix, void *ptr, int fd);
+void		print_total_mem(size_t mem_sz, int fd);
 char        *ft_itoa_base_malloc(char *res, unsigned long long a, unsigned base);
 void		free_zone(t_malloc_zone **zone_list, t_malloc_zone *zone);
 _Bool		free_block(t_malloc_zone **zone_main, void *ptr);
 _Bool		free_large(void *ptr);
-void		malloc_log(const char *str, size_t size);
+void		malloc_log(const char *str, size_t size, void *addr, size_t sz);
 
 #endif

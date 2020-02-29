@@ -8,7 +8,7 @@ static size_t	show_blocks_info(t_malloc_block *block)
 	while (block)
 	{
 		void *mem = (void*)block + sizeof(t_malloc_block);
-		print_block_info(mem, mem + block->size, block->size);
+		print_block_info(mem, mem + block->size, block->size, 1);
 		size_sum += block->size;
 		block = block->next;
 	}
@@ -27,7 +27,7 @@ static size_t	show_zones_info(t_malloc_zone *zone, t_zone zone_type)
 		prefix = "SMALL";
 	while (zone)
 	{   
-		print_zone_info(prefix, zone);
+		print_zone_info(prefix, zone, 1);
 		size_sum += show_blocks_info(zone->allocated_blocks);
 		zone = zone->next;
 	}   
@@ -44,10 +44,10 @@ void		show_alloc_mem(void)
 	allocated_mem_size += show_zones_info(g_malloc_zones.small, SMALL_ZONE);
 	if (g_malloc_zones.large)
 	{   
-		print_zone_info("LARGE", g_malloc_zones.large);
+		print_zone_info("LARGE", g_malloc_zones.large, 1);
 		allocated_mem_size += show_blocks_info(g_malloc_zones.large);
 	}   
-	print_total_mem(allocated_mem_size);
+	print_total_mem(allocated_mem_size, 1);
 	pthread_mutex_unlock(&g_mtx_malloc);
 }
 
