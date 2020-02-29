@@ -40,14 +40,19 @@ void			*malloc_impl(size_t sz)
 	return (ptr);
 }
 
+void    print_int_malloc(uintmax_t val);
 void			*malloc(size_t sz)
 {
 	void	*ptr;
 
 	ptr = NULL;
+	MALLOC_LOG("______TESTT+START_________");
+	print_int_malloc(sz);
+	write(1,"\n", 1);
 	pthread_mutex_lock(&g_mtx_malloc);
 	ptr = malloc_impl(sz);
 	pthread_mutex_unlock(&g_mtx_malloc);
+	MALLOC_LOG("______TESTT+END_________");
 	return (ptr);
 }
 

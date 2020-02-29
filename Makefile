@@ -6,7 +6,7 @@
 #    By: rtulchiy <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/02/13 18:49:17 by rtulchiy          #+#    #+#              #
-#    Updated: 2018/02/25 13:15:22 by rtulchiy         ###   ########.fr        #
+#    Updated: 2020/02/29 10:16:45 by rtulchiy         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,13 +24,13 @@ CFLAGS = -Wall -Werror -Wextra
 LIBDIR = libft
 
 %.o: src/%.c
-	gcc $(CFLAGS) -fPIC -c $< -pthread -I includes
+	clang $(CFLAGS) -fPIC -c $< -pthread -I includes -mmacosx-version-min=10.0
 
 all: $(NAME)
 
 $(NAME): $(OBJO)
 	make -C $(LIBDIR)
-	gcc $(CFLAGS) -shared -o $(NAME) $(OBJO) -L./$(LIBDIR) -lft -pthread -I ../includes
+	clang $(CFLAGS) -shared -o $(NAME) $(OBJO) -L./$(LIBDIR) -lft -I ../includes -mmacosx-version-min=10.0
 	ln -s $(NAME) libft_malloc.so
 
 clean:

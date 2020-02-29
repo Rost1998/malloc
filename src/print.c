@@ -10,7 +10,7 @@ static void	print_addr_malloc(void *ptr)
 	write(1, addr, ft_strlen(addr));
 }
 
-static void	print_int_malloc(uintmax_t val)
+void	print_int_malloc(uintmax_t val)
 {
 	char	num[1024];
 

@@ -1,7 +1,8 @@
 #ifndef __FT_MALLOC_H__
 # define __FT_MALLOC_H__
 
-# include <stddef.h>
+# include <sys/types.h>
+# include <sys/mman.h>
 
 void    *malloc(size_t sz);
 void    *realloc(void *ptr, size_t sz);

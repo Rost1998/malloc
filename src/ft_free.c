@@ -2,26 +2,24 @@
 
 void		free_impl(void *ptr)
 {
-	t_malloc_block	*block_tmp;
-	t_zone		zone_type;
+	_Bool			res;
 
 	if (ptr == NULL)
 		return;
-	block_tmp = ptr - sizeof(t_malloc_block);
-	zone_type = (block_tmp->size > TINY_BLOCK_SIZE) + (block_tmp->size > SMALL_BLOCK_SIZE);
-	if (zone_type == TINY_ZONE)
-		free_block(&g_malloc_zones.tiny, ptr);
-	else if (zone_type == SMALL_ZONE)
-		free_block(&g_malloc_zones.small, ptr);
-	else if (zone_type == LARGE_ZONE)
+	res = free_block(&g_malloc_zones.tiny, ptr);
+	if (res == 0)
+		res = free_block(&g_malloc_zones.small, ptr);
+	if (res == 0)
 		free_large(ptr);
 }
 
 void		free(void *ptr)
 {
+	MALLOC_LOG("______TESTTSTART++_________");
 	pthread_mutex_lock(&g_mtx_malloc);
 	free_impl(ptr);
 	pthread_mutex_unlock(&g_mtx_malloc);
+	MALLOC_LOG("______TESTTEND++_________");
 }
 
 static void	afree_large(t_malloc_block *large)
