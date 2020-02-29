@@ -2,12 +2,7 @@
 
 _Bool		malloc_debug_mode(void)
 {
-	char *env_var;
-
-	env_var = getenv("FT_MALLOC_DEBUG");
-	if (env_var == NULL)
-		return (0);
-	return (*env_var == '1' ? 1 : 0);
+	return 1;
 }
 
 t_malloc_block	*find_block(t_malloc_block *block, void *ptr)
@@ -49,9 +44,9 @@ size_t		malloc_align(size_t size)
 	return (ret_size);
 }
 
-_Bool		is_mul_overflow(uintmax_t a, uintmax_t b)
+_Bool		is_mul_overflow(unsigned long long a, unsigned long long b)
 {
-	uintmax_t	res;
+	unsigned long long	res;
 
 	if (a == 0 || b == 0)
 		return (0);

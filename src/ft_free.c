@@ -15,11 +15,9 @@ void		free_impl(void *ptr)
 
 void		free(void *ptr)
 {
-	MALLOC_LOG("______TESTTSTART++_________");
 	pthread_mutex_lock(&g_mtx_malloc);
 	free_impl(ptr);
 	pthread_mutex_unlock(&g_mtx_malloc);
-	MALLOC_LOG("______TESTTEND++_________");
 }
 
 static void	afree_large(t_malloc_block *large)

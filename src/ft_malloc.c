@@ -1,16 +1,13 @@
 #include "ft_malloc.h"
 #include "private/malloc_private.h"
 
-// 1. проверить на мак ОС по первым пунктам (page reclaims)
-// 2. нормы
-
 t_zones g_malloc_zones = {NULL, NULL, NULL};
 pthread_mutex_t g_mtx_malloc = PTHREAD_MUTEX_INITIALIZER;
 
 static void		*get_block(t_malloc_zone **zone_main, size_t block_size, size_t mem_required_size)
 {
 	t_malloc_zone	*zone_tmp;
-	void		*ptr;
+	void			*ptr;
 
 	zone_tmp = *zone_main;
 	ptr = NULL;
@@ -40,19 +37,14 @@ void			*malloc_impl(size_t sz)
 	return (ptr);
 }
 
-void    print_int_malloc(uintmax_t val);
 void			*malloc(size_t sz)
 {
 	void	*ptr;
 
 	ptr = NULL;
-	MALLOC_LOG("______TESTT+START_________");
-	print_int_malloc(sz);
-	write(1,"\n", 1);
 	pthread_mutex_lock(&g_mtx_malloc);
 	ptr = malloc_impl(sz);
 	pthread_mutex_unlock(&g_mtx_malloc);
-	MALLOC_LOG("______TESTT+END_________");
 	return (ptr);
 }
 

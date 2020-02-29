@@ -16,7 +16,7 @@ static void	ft_revarr_malloc(char *str)
 	}   
 }
 
-char		*ft_itoa_base_malloc(char *res, uintmax_t a, unsigned base)
+char		*ft_itoa_base_malloc(char *res, unsigned long long a, unsigned base)
 {
 	const char	*symbols;
 	int		i;  

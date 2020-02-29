@@ -3,7 +3,7 @@
 #include "ft_malloc.h"
 #include <dlfcn.h>
 
-#define NUM 500
+#define NUM 5
 
 void    test(void *(*func)(size_t))
 {

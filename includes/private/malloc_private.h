@@ -4,10 +4,12 @@
 # include <sys/types.h>
 # include <sys/mman.h>
 # include <pthread.h>
+# include <sys/stat.h>
+# include <fcntl.h>
 # include "libft.h"
 
 # define MALLOC_LOG_PREFIX "FT_MALLOC DEBUG: "
-# define MALLOC_LOG(str) write(1, MALLOC_LOG_PREFIX str "\n", 17 + ft_strlen(str) + 1)
+# define MALLOC_LOG(str) malloc_log(MALLOC_LOG_PREFIX str, 17 + ft_strlen(str))
 
 # define ALLOCATIONS_NUM 100
 
@@ -53,16 +55,17 @@ _Bool		malloc_debug_mode(void);
 t_malloc_block *find_block(t_malloc_block *block, void *ptr);
 t_malloc_block *find_block_in_zones(t_malloc_zone *zone, void *ptr);
 size_t		malloc_align(size_t size);
-_Bool		is_mul_overflow(uintmax_t a, uintmax_t b);
+_Bool		is_mul_overflow(unsigned long long a, unsigned long long b);
 t_malloc_zone *add_zone(t_malloc_zone **zone_main, size_t block_size);
 void		*alloc_large(size_t size);
 void		*block_alloc(t_malloc_zone *zone, size_t size);
 void		print_block_info(void *ptr_start, void *ptr_end, size_t size);
 void		print_zone_info(const char *prefix, void *ptr);
 void		print_total_mem(size_t mem_sz);
-char        *ft_itoa_base_malloc(char *res, uintmax_t a, unsigned base);
+char        *ft_itoa_base_malloc(char *res, unsigned long long a, unsigned base);
 void		free_zone(t_malloc_zone **zone_list, t_malloc_zone *zone);
 _Bool		free_block(t_malloc_zone **zone_main, void *ptr);
 _Bool		free_large(void *ptr);
+void		malloc_log(const char *str, size_t size);
 
 #endif

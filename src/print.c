@@ -6,11 +6,11 @@ static void	print_addr_malloc(void *ptr)
 
 	ft_memset(addr, 0, 1024);
 	write(1, "0x", 2);
-	ft_itoa_base_malloc(addr, (uintmax_t)ptr, 16);
+	ft_itoa_base_malloc(addr, (unsigned long long)ptr, 16);
 	write(1, addr, ft_strlen(addr));
 }
 
-void	print_int_malloc(uintmax_t val)
+static void	print_int_malloc(unsigned long long val)
 {
 	char	num[1024];
 

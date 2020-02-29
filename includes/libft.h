@@ -6,7 +6,7 @@
 /*   By: rtulchiy <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/26 12:13:20 by rtulchiy          #+#    #+#             */
-/*   Updated: 2018/02/04 15:19:42 by rtulchiy         ###   ########.fr       */
+/*   Updated: 2020/02/29 11:42:43 by rtulchiy         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ void				ft_strclr(char *s);
 void				ft_striter(char *s, void (*f)(char*));
 void				ft_striteri(char *s, void (*f)(unsigned int, char*));
 char				*ft_strmap(char const *s, char (*f)(char));
-intmax_t			ft_pow(intmax_t num, int d);
+long long			ft_pow(long long num, int d);
 void				*ft_realloc(void *ptr, size_t newsize);
 char				*ft_strjoin_modf(char *s1, char *s2,
 											_Bool mode1, _Bool mode2);
