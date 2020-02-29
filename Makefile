@@ -6,7 +6,7 @@
 #    By: rtulchiy <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/02/13 18:49:17 by rtulchiy          #+#    #+#              #
-#    Updated: 2020/02/29 12:53:20 by rtulchiy         ###   ########.fr        #
+#    Updated: 2020/02/29 16:04:16 by rtulchiy         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ OBJO = $(OBJSRC:.c=.o)
 CFLAGS = -Wall -Werror -Wextra -g
 
 %.o: src/%.c
-	cc $(CFLAGS) -fPIC -c $< -pthread -I includes -D_GNU_SOURCE
+	cc $(CFLAGS) -fPIC -c $< -pthread -I includes
 
 all: $(NAME)
 

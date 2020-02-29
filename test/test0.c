@@ -1,4 +1,4 @@
-#include "ft_malloc.h"
+#include <stdlib.h>
 
 int main()
 {

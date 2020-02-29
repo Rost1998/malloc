@@ -44,30 +44,30 @@ typedef struct s_zones {
     t_malloc_block  *large;
 } t_zones;
 
-extern t_zones g_malloc_zones;
-extern pthread_mutex_t g_mtx_malloc;
+extern t_zones			g_malloc_zones;
+extern pthread_mutex_t	g_mtx_malloc;
 
-void    *malloc_impl(size_t sz);
-void    *realloc_impl(void *ptr, size_t sz);
-void    free_impl(void *ptr);
+void			*malloc_impl(size_t sz);
+void			*realloc_impl(void *ptr, size_t sz);
+void			free_impl(void *ptr);
 
-_Bool		malloc_debug_mode(void);
-t_malloc_block *find_block(t_malloc_block *block, void *ptr);
-t_malloc_block *find_block_in_zones(t_malloc_zone *zone, void *ptr);
-size_t		malloc_align(size_t size);
-_Bool		is_mul_overflow(unsigned long long a, unsigned long long b);
-t_malloc_zone *add_zone(t_malloc_zone **zone_main, size_t block_size);
-void		*alloc_large(size_t size);
-void		*block_alloc(t_malloc_zone *zone, size_t size);
-void		print_block_info(void *ptr_start, void *ptr_end, size_t size, int fd);
-void        print_addr_malloc(void *ptr, int fd);
-void        print_int_malloc(unsigned long long val, int fd);
-void		print_zone_info(const char *prefix, void *ptr, int fd);
-void		print_total_mem(size_t mem_sz, int fd);
-char        *ft_itoa_base_malloc(char *res, unsigned long long a, unsigned base);
-void		free_zone(t_malloc_zone **zone_list, t_malloc_zone *zone);
-_Bool		free_block(t_malloc_zone **zone_main, void *ptr);
-_Bool		free_large(void *ptr);
-void		malloc_log(const char *str, size_t size, void *addr, size_t sz);
+_Bool			malloc_debug_mode(void);
+t_malloc_block	*find_block(t_malloc_block *block, void *ptr);
+t_malloc_block	*find_block_in_zones(t_malloc_zone *zone, void *ptr);
+size_t			malloc_align(size_t size);
+_Bool			is_mul_overflow(unsigned long long a, unsigned long long b);
+t_malloc_zone	*add_zone(t_malloc_zone **zone_main, size_t block_size);
+void			*alloc_large(size_t size);
+void			*block_alloc(t_malloc_zone *zone, size_t size);
+void			print_block_info(void *ptr_start, void *ptr_end, size_t size, int fd);
+void			print_addr_malloc(void *ptr, int fd);
+void			print_int_malloc(unsigned long long val, int fd);
+void			print_zone_info(const char *prefix, void *ptr, int fd);
+void			print_total_mem(size_t mem_sz, int fd);
+char			*ft_itoa_base_malloc(char *res, unsigned long long a, unsigned base);
+void			free_zone(t_malloc_zone **zone_list, t_malloc_zone *zone);
+_Bool			free_block(t_malloc_zone **zone_main, void *ptr);
+_Bool			free_large(void *ptr);
+void			malloc_log(const char *str, size_t size, void *addr, size_t sz);
 
 #endif
