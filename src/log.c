@@ -13,4 +13,5 @@ void	malloc_log(const char *log, size_t size, void *addr, size_t sz)
 	write(fd, " | size: ", 9);
 	print_int_malloc(sz, fd);
 	write(fd, "]\n", 2);
+    close(fd);
 }

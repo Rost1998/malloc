@@ -27,8 +27,7 @@ int     main(void)
 //    ft_free = dlsym(handle, "free");
 //    show_alloc_mem = dlsym(handle, "show_alloc_mem");
 
-	free(0x34);
-
+	free((void*)0x324);
     for (i = 0; i < NUM; ++i)
     {
         array[i] = malloc(2048);
